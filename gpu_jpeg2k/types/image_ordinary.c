@@ -46,7 +46,7 @@ void init_image(FIBITMAP* dib, type_image *container, type_parameters *param)
 	container->num_dlvls = param->param_tile_comp_dlvls;
 
 	set_coding_parameters(container, param);
-	init_tiles(&container, param);
+	init_tiles(&container);
 
 //	println_end(INFO);
 }
@@ -197,7 +197,7 @@ long int read_ordinary_image(type_image **_container, type_parameters *param)
 		BYTE *bits = malloc(mem_size * sizeof(BYTE));
 
 		// convert the bitmap to raw bits (top-left pixel first)
-		FreeImage_ConvertToRawBits(bits, dib, scan_width, FreeImage_GetBPP(dib), FI_RGBA_RED_MASK/*FI_RGBA_BLUE_MASK*/, FI_RGBA_GREEN_MASK, /*FI_RGBA_RED_MASK*/FI_RGBA_BLUE_MASK, TRUE);
+		FreeImage_ConvertToRawBits(bits, dib, scan_width, FreeImage_GetBPP(dib), /*FI_RGBA_RED_MASK*/FI_RGBA_BLUE_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_RED_MASK/*FI_RGBA_BLUE_MASK*/, TRUE);
 //		FreeImage_ConvertToRawBits(bits, dib, scan_width, FreeImage_GetBPP(dib), FI_RGBA_GREEN_MASK/*FI_RGBA_BLUE_MASK*/, FI_RGBA_BLUE_MASK, /*FI_RGBA_RED_MASK*/FI_RGBA_RED_MASK, TRUE);
 
 		FreeImage_Unload(dib);

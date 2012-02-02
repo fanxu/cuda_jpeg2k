@@ -29,7 +29,7 @@ void init_bil_image(type_image *container, type_image_hyper *image_bil, type_par
 
 	/* Set coding parameters */
 	set_coding_parameters(container, param);
-	init_tiles(&container, param);
+	init_tiles(&container);
 }
 
 /**

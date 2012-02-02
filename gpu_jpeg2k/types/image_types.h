@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include "../tier2/tag_tree_encode.h"
 #include "image_mct.h"
+#include "../misc/memory.h"
 
 #define UNSIGNED 0U
 #define SIGNED 1U
@@ -400,6 +401,14 @@ struct type_image
 	/** Number of all tiles */
 	uint32_t num_tiles;
 
+	/** Nominal exponent value for code-block width */
+	/** XXX: Minimum for code-block dimension is 4.
+	 * 	Maximum dimension is 64.  */
+	uint8_t cblk_exp_w;
+
+	/** Nominal exponent value for code-block height */
+	uint8_t cblk_exp_h;
+
 	/** Was the MCT used? */
 	uint8_t use_mct;
 
@@ -432,6 +441,9 @@ struct type_image
 
 	/** Coding parameters */
 	type_coding_param *coding_param;
+
+	/** Memory manager */
+	mem_mg_t *mem_mg;
 };
 
 #endif

@@ -235,13 +235,15 @@ void init_resolution_lvls(type_tile_comp *tile_comp) {
  *
  * @param tile This tile components will be initialized
  */
-void init_tile_comps(type_tile *tile, type_parameters *param) {
+void init_tile_comps(type_tile *tile) {
 	uint16_t i;
 	type_tile_comp *tile_comp;
 	type_image *parent_img;
+	mem_mg_t *mem_mg;
 
 	parent_img = tile->parent_img;
-	tile->tile_comp = (type_tile_comp *) malloc(parent_img->num_components * sizeof(type_tile_comp));
+	mem_mg = parent_img->mem_mg;
+	tile->tile_comp = (type_tile_comp *) mem_mg->alloc->host(parent_img->num_components * sizeof(type_tile_comp), mem_mg->ctx);
 
 	//	println_var(INFO, "no:%d tlx:%d tly:%d brx:%d bry:%d w:%d h:%d", tile->tile_no, tile->tlx, tile->tly, tile->brx, tile->bry, tile->width, tile->height);
 
@@ -260,8 +262,8 @@ void init_tile_comps(type_tile *tile, type_parameters *param) {
 		tile_comp->num_rlvls = tile_comp->num_dlvls + 1;
 
 		/* Maximum code block size is 64x64 (2^6x2^6).*/
-		tile_comp->cblk_exp_w = param->param_cblk_exp_w;
-		tile_comp->cblk_exp_h = param->param_cblk_exp_h;
+		tile_comp->cblk_exp_w = parent_img->cblk_exp_w;
+		tile_comp->cblk_exp_h = parent_img->cblk_exp_h;
 		tile_comp->cblk_w = 1 << tile_comp->cblk_exp_w;
 		tile_comp->cblk_h = 1 << tile_comp->cblk_exp_h;
 		//printf("tile w:%d h:%d\n", tile_comp->width, tile_comp->height);
@@ -282,7 +284,7 @@ void init_tile_comps(type_tile *tile, type_parameters *param) {
  *
  * @param _img Container in which tiles should be initialized in.
  */
-void init_tiles(type_image **_img, type_parameters *param) {
+void init_tiles(type_image **_img) {
 	//	println_start(INFO);
 	type_image *img = *_img;
 	uint32_t i = 0;
@@ -293,9 +295,6 @@ void init_tiles(type_image **_img, type_parameters *param) {
 	/* Temporary pointers */
 	type_tile *tile;
 
-	/* Checks if tile width and height are <= image width and height */
-	img->tile_h = (param->param_tile_h == -1U ? img->height : (param->param_tile_h <= img->height ?param->param_tile_h : img->height) ); ///Nominal tile height.
-	img->tile_w = (param->param_tile_w == -1U ? img->width : (param->param_tile_w <= img->width ? param->param_tile_w : img->width)); ///Nominal tile width.
 	//println_var(INFO, "container->tile_h:%d container->tile_w:%d", container->tile_h, container->tile_w);
 
 	img->num_xtiles = (img->width + (img->tile_w - 1)) / img->tile_w;
@@ -303,7 +302,7 @@ void init_tiles(type_image **_img, type_parameters *param) {
 	img->num_tiles = img->num_xtiles * img->num_ytiles;
 
 	//	cuda_h_allocate_mem((void **) &(img->tile), img->num_tiles * sizeof(type_tile));
-	img->tile = (type_tile *) malloc(img->num_tiles * sizeof(type_tile));
+	img->tile = (type_tile *) img->mem_mg->alloc->host(img->num_tiles * sizeof(type_tile), img->mem_mg->ctx);
 
 	//	println_var(INFO, "w:%d h:%d no_com:%d area:%d t_w:%d t_h:%d t_x:%d t_y:%d no_t:%d", img->width,img->height,img->num_components,img->area_alloc,img->tile_w,img->tile_h,img->num_xtiles,img->num_ytiles,img->num_tiles);
 
@@ -325,7 +324,7 @@ void init_tiles(type_image **_img, type_parameters *param) {
 
 		tile->parent_img = img;
 
-		init_tile_comps(tile, param);
+		init_tile_comps(tile);
 	}
 	//	println_end(INFO);
 }
@@ -359,6 +358,11 @@ static void init_params(type_image *img, type_parameters *param) {
 	img->use_mct = param->param_use_mct;
 	img->use_part2_mct = param->param_use_part2_mct;
 	img->mct_compression_method = param->param_mct_compression_method;
+	img->cblk_exp_w = param->param_cblk_exp_w;
+	img->cblk_exp_h = param->param_cblk_exp_h;
+	/* Checks if tile width and height are <= image width and height */
+	img->tile_h = (param->param_tile_h == -1U ? img->height : (param->param_tile_h <= img->height ?param->param_tile_h : img->height));
+	img->tile_w = (param->param_tile_w == -1U ? img->width : (param->param_tile_w <= img->width ? param->param_tile_w : img->width));
 
 	img->coding_style = CODING_STYLE;
 	img->prog_order = LY_RES_COMP_POS_PROG;

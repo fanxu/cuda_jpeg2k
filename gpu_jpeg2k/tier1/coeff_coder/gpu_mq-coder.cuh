@@ -5,8 +5,8 @@
 
 typedef unsigned char byte;
 
-#define CX_RUN 18
-#define CX_UNI 17
+#define CX_RUN 17
+#define CX_UNI 18
 
 struct MQEncoder
 {

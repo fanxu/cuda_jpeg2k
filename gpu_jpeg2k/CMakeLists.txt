@@ -34,6 +34,8 @@ cuda_add_executable(encoder
 print_info/print_info.c
 encoder.c)
 
+#add_library(gpu_jpeg2k
+
 TARGET_LINK_LIBRARIES( encoder 
 ${FREEIMAGE_LIBRARY} 
 m
